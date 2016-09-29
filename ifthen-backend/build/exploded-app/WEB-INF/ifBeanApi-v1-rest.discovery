@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/BpqS7WlzVFj5rQzqjPZlh6mjenE\"",
+ "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/-XawZJAkiVf66uONo0_4iZzvWro\"",
  "discoveryVersion": "v1",
  "id": "ifBeanApi:v1",
  "name": "ifBeanApi",
@@ -96,10 +96,10 @@
      "type": "string",
      "format": "int64"
     },
-    "text": {
+    "sessionId": {
      "type": "string"
     },
-    "userId": {
+    "text": {
      "type": "string"
     }
    }
@@ -194,6 +194,16 @@
    "id": "ifBeanApi.random",
    "path": "randomIfBean",
    "httpMethod": "GET",
+   "parameters": {
+    "sessoinId": {
+     "type": "string",
+     "required": true,
+     "location": "query"
+    }
+   },
+   "parameterOrder": [
+    "sessoinId"
+   ],
    "response": {
     "$ref": "IfBean"
    },

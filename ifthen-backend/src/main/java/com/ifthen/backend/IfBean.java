@@ -16,5 +16,5 @@ import lombok.Setter;
 public class IfBean {
     @Id Long id;
     private String text;
-    private String userId;
+    private String sessionId;
 }

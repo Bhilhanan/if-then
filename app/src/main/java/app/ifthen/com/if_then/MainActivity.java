@@ -1,11 +1,14 @@
 package app.ifthen.com.if_then;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.UserManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,10 +22,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String IF ="if";
     private static final String THEN ="then";
-    private static final int REQUEST_ACCOUNT_PICKER = 2;
-    private SharedPreferences settings;
+//    private static final int REQUEST_ACCOUNT_PICKER = 2;
+//    private SharedPreferences settings;
     private GoogleAccountCredential credential;
-    private String accountName;
+//    private String accountName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        //account stuff
 //        //Account stuff
-//        settings = getSharedPreferences("FamousQuotesAndroid", 0);
+//        settings = getSharedPreferences("if-then-shared-preferences", 0);
 //        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:956984926970-59s38oierppv3e8ld188gkebm2vkkegf.apps.googleusercontent.com");
 //        setAccountName(settings.getString("ACCOUNT_NAME", null));
 //        if (credential.getSelectedAccountName() != null) {
@@ -45,13 +48,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view) {
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
         EditText editIf=(EditText)findViewById(R.id.edit_if);
         String ifStr=editIf.getText().toString();
         EditText editThen=(EditText)findViewById(R.id.edit_then);
         String thenStr=editThen.getText().toString();
-        new EndpointsAsyncTask(this, ifStr, thenStr,credential).execute();
+        EditText editSessionKey=(EditText)findViewById(R.id.edit_sessionKey);
+        String sessionKey=editSessionKey.getText().toString();
+        new EndpointsAsyncTask(this, ifStr, thenStr,sessionKey,credential).execute();
     }
-//
+
 //    private void setAccountName(String accountName) {
 //        SharedPreferences.Editor editor = settings.edit();
 //        editor.putString("ACCOUNT_NAME", accountName);

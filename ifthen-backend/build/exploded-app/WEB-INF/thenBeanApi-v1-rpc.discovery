@@ -1,6 +1,6 @@
 {
  "kind": "discovery#rpcDescription",
- "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/zwj7sEgMp0_fQTLb83lGnN1niL4\"",
+ "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/PD1J9kvpakNVA4nQ8TKrDelYz64\"",
  "discoveryVersion": "v1",
  "id": "thenBeanApi:v1",
  "name": "thenBeanApi",
@@ -94,10 +94,10 @@
      "type": "string",
      "format": "int64"
     },
-    "text": {
+    "sessionId": {
      "type": "string"
     },
-    "userId": {
+    "text": {
      "type": "string"
     }
    }
@@ -168,10 +168,10 @@
      "type": "string",
      "format": "int64"
     },
-    "text": {
+    "sessionId": {
      "type": "string"
     },
-    "userId": {
+    "text": {
      "type": "string"
     }
    },
@@ -188,6 +188,15 @@
   "thenBeanApi.random": {
    "id": "thenBeanApi.random",
    "allowGet": true,
+   "parameters": {
+    "sessionId": {
+     "type": "string",
+     "required": true
+    }
+   },
+   "parameterOrder": [
+    "sessionId"
+   ],
    "returns": {
     "$ref": "ThenBean"
    },

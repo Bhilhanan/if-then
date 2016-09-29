@@ -29,11 +29,13 @@ public class EndpointsAsyncTask extends AsyncTask<Void, String, IfThen> {
     private static IfBeanApi ifBeanApi;
     private static ThenBeanApi thenBeanApi;
     private final GoogleAccountCredential credential;
+    private final String sessionKey;
 
-    public EndpointsAsyncTask(Context context, String ifStr, String thenStr, GoogleAccountCredential credential) {
+    public EndpointsAsyncTask(Context context, String ifStr, String thenStr, String sessionKey, GoogleAccountCredential credential) {
         this.mainActivity = (MainActivity) context;
         this.ifStr = ifStr;
         this.thenStr = thenStr;
+        this.sessionKey=sessionKey;
         this.credential=credential;
     }
 
@@ -57,20 +59,19 @@ public class EndpointsAsyncTask extends AsyncTask<Void, String, IfThen> {
         publishProgress("Making sense of Then");
         try {
             publishProgress("Giving up on making sense of your If and Then. Sending it anyway ....");
-            IfBean ifBean = ifBeanApi.insert(new IfBean().setUserId("user01").setText(ifStr)).execute();
-            ThenBean thenBean = thenBeanApi.insert(new ThenBean().setUserId("user01").setText(thenStr)).execute();
+            IfBean ifBean = ifBeanApi.insert(new IfBean().setSessionId(sessionKey).setText(ifStr)).execute();
+            ThenBean thenBean = thenBeanApi.insert(new ThenBean().setSessionId(sessionKey).setText(thenStr)).execute();
             Log.d("Tag", "doInBackground: " + ifBean == null ? "null" : ifBean.toString() + " " + thenBean == null ? "null" : thenBean.toString());
             publishProgress("Randomizing If and Then ....");
-            return new IfThen(ifBeanApi.random().execute(), thenBeanApi.random().execute());
-        } catch (IOException e) {
+            return new IfThen(ifBeanApi.random(sessionKey).execute(), thenBeanApi.random(sessionKey).execute());
+        } catch (Exception e) {
             Log.d("Tag", "doInBackground,error: " + e);
-            return null;
+            return new IfThen(new IfBean(),new ThenBean());
         }
     }
 
     @Override
     protected void onPostExecute(IfThen ifThen) {
-        Log.d("Tag", "onPostExecute: " + ifThen);
         TextView textResult = (TextView) mainActivity.findViewById(R.id.text_result);
         textResult.setText("If " + ifThen.getIfBean().getText() + " then " + ifThen.getThenBean().getText());
     }

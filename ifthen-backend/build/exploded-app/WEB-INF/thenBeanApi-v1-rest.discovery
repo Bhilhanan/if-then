@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/zwj7sEgMp0_fQTLb83lGnN1niL4\"",
+ "etag": "\"zRMgE0l9nVDW4S28VYYcYQF9UW4/PD1J9kvpakNVA4nQ8TKrDelYz64\"",
  "discoveryVersion": "v1",
  "id": "thenBeanApi:v1",
  "name": "thenBeanApi",
@@ -96,10 +96,10 @@
      "type": "string",
      "format": "int64"
     },
-    "text": {
+    "sessionId": {
      "type": "string"
     },
-    "userId": {
+    "text": {
      "type": "string"
     }
    }
@@ -194,6 +194,16 @@
    "id": "thenBeanApi.random",
    "path": "randomThenBean",
    "httpMethod": "GET",
+   "parameters": {
+    "sessionId": {
+     "type": "string",
+     "required": true,
+     "location": "query"
+    }
+   },
+   "parameterOrder": [
+    "sessionId"
+   ],
    "response": {
     "$ref": "ThenBean"
    },

@@ -8,7 +8,6 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.users.User;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
@@ -39,8 +38,6 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
                 ownerName = "backend.ifthen.com",
                 packagePath = ""
         )
-//        ,
-//        clientIds = {Constants.ANDROID_CLIENT_ID}
 )
 public class ThenBeanEndpoint {
 
@@ -64,10 +61,7 @@ public class ThenBeanEndpoint {
             name = "get",
             path = "thenBean/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public ThenBean get(@Named("id") long id) throws NotFoundException, UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public ThenBean get(@Named("id") Long id) throws NotFoundException {
         logger.info("Getting ThenBean with ID: " + id);
         ThenBean thenBean = ofy().load().type(ThenBean.class).id(id).now();
         if (thenBean == null) {
@@ -83,17 +77,14 @@ public class ThenBeanEndpoint {
             name = "insert",
             path = "thenBean",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public ThenBean insert(ThenBean thenBean) throws UnauthorizedException {
+    public ThenBean insert(ThenBean thenBean) {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that thenBean.id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
         ofy().save().entity(thenBean).now();
-        logger.info("Created ThenBean.");
+        logger.info("Created ThenBean with ID: " + thenBean.getId());
 
         return ofy().load().entity(thenBean).now();
     }
@@ -111,11 +102,8 @@ public class ThenBeanEndpoint {
             name = "update",
             path = "thenBean/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public ThenBean update(@Named("id") long id, ThenBean thenBean) throws NotFoundException, UnauthorizedException {
+    public ThenBean update(@Named("id") Long id, ThenBean thenBean) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
         checkExists(id);
         ofy().save().entity(thenBean).now();
         logger.info("Updated ThenBean: " + thenBean);
@@ -133,10 +121,7 @@ public class ThenBeanEndpoint {
             name = "remove",
             path = "thenBean/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") long id) throws NotFoundException, UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public void remove(@Named("id") Long id) throws NotFoundException {
         checkExists(id);
         ofy().delete().type(ThenBean.class).id(id).now();
         logger.info("Deleted ThenBean with ID: " + id);
@@ -153,10 +138,7 @@ public class ThenBeanEndpoint {
             name = "list",
             path = "thenBean",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<ThenBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public CollectionResponse<ThenBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<ThenBean> query = ofy().load().type(ThenBean.class).limit(limit);
         if (cursor != null) {
@@ -174,10 +156,7 @@ public class ThenBeanEndpoint {
             name = "random",
             path = "randomThenBean",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public ThenBean random() throws UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public ThenBean random(@Named("sessionId") String sessionId) throws UnauthorizedException {
         Collection<ThenBean> thenList = list(null, null).getItems();
         int rand = (int) (Math.random() * thenList.size());
         Iterator<ThenBean> iterator = thenList.iterator();
@@ -188,7 +167,7 @@ public class ThenBeanEndpoint {
         return iterator.next();
     }
 
-    private void checkExists(long id) throws NotFoundException {
+    private void checkExists(Long id) throws NotFoundException {
         try {
             ofy().load().type(ThenBean.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {

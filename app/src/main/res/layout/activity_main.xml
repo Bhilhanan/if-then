@@ -10,43 +10,50 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="app.ifthen.com.if_then.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <EditText android:id="@+id/edit_sessionKey"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="If"
-        android:id="@+id/text_if"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="11dp" />
+        android:layout_marginTop="11dp"
+        android:hint="session key"/>
+
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="If"-->
+        <!--android:id="@+id/text_if"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_marginTop="11dp" />-->
 
     <EditText android:id="@+id/edit_if"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter if statement"
-        android:layout_below="@+id/text_if"
+        android:hint="if"
+        android:layout_below="@id/edit_sessionKey"
         android:layout_alignParentStart="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Then"
-        android:id="@+id/text_then"
-        android:layout_below="@id/edit_if"
-        android:layout_marginTop="11dp" />
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Then"-->
+        <!--android:id="@+id/text_then"-->
+        <!--android:layout_below="@id/edit_if"-->
+        <!--android:layout_marginTop="11dp" />-->
 
     <EditText android:id="@+id/edit_then"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter then statement"
-        android:layout_below="@+id/text_then"
+        android:hint="then"
+        android:layout_below="@+id/edit_if"
         android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send"
-        android:layout_below="@+id/edit_if"
-        android:layout_toEndOf="@+id/text_if"
+        android:layout_below="@+id/edit_then"
         android:layout_marginTop="78dp"
         android:id="@+id/button_send"
         android:onClick="sendMessage"/>
@@ -54,9 +61,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text=""
+        android:text="Enter an If and Then statement and tap Send"
         android:id="@+id/text_result"
         android:layout_below="@id/button_send"
-        android:layout_marginTop="11dp" />
+        android:layout_marginTop="11dp"
+        android:gravity="center"
+        android:textStyle="bold"/>
 
 </RelativeLayout>

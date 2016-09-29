@@ -1,6 +1,5 @@
 package com.ifthen.backend;
 
-import com.google.api.server.spi.Constant;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
@@ -9,7 +8,6 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.users.User;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
@@ -40,12 +38,6 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
                 ownerName = "backend.ifthen.com",
                 packagePath = ""
         )
-//        ,
-//        scopes = {Constants.EMAIL_SCOPE},
-//        clientIds = {Constants.WEB_CLIENT_ID,
-//                Constants.ANDROID_CLIENT_ID,
-//                Constant.API_EXPLORER_CLIENT_ID},
-//        audiences = {Constants.ANDROID_AUDIENCE}
 )
 public class IfBeanEndpoint {
 
@@ -69,10 +61,7 @@ public class IfBeanEndpoint {
             name = "get",
             path = "ifBean/{id}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public IfBean get(@Named("id") Long id) throws NotFoundException, UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public IfBean get(@Named("id") Long id) throws NotFoundException {
         logger.info("Getting IfBean with ID: " + id);
         IfBean ifBean = ofy().load().type(IfBean.class).id(id).now();
         if (ifBean == null) {
@@ -88,17 +77,14 @@ public class IfBeanEndpoint {
             name = "insert",
             path = "ifBean",
             httpMethod = ApiMethod.HttpMethod.POST)
-    public IfBean insert(IfBean ifBean) throws UnauthorizedException {
+    public IfBean insert(IfBean ifBean) {
         // Typically in a RESTful API a POST does not have a known ID (assuming the ID is used in the resource path).
         // You should validate that ifBean.id has not been set. If the ID type is not supported by the
         // Objectify ID generator, e.g. long or String, then you should generate the unique ID yourself prior to saving.
         //
         // If your client provides the ID then you should probably use PUT instead.
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
         ofy().save().entity(ifBean).now();
-        logger.info("Created IfBean.");
+        logger.info("Created IfBean with ID: " + ifBean.getId());
 
         return ofy().load().entity(ifBean).now();
     }
@@ -116,11 +102,8 @@ public class IfBeanEndpoint {
             name = "update",
             path = "ifBean/{id}",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public IfBean update(@Named("id") Long id, IfBean ifBean) throws NotFoundException, UnauthorizedException {
+    public IfBean update(@Named("id") Long id, IfBean ifBean) throws NotFoundException {
         // TODO: You should validate your ID parameter against your resource's ID here.
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
         checkExists(id);
         ofy().save().entity(ifBean).now();
         logger.info("Updated IfBean: " + ifBean);
@@ -138,10 +121,7 @@ public class IfBeanEndpoint {
             name = "remove",
             path = "ifBean/{id}",
             httpMethod = ApiMethod.HttpMethod.DELETE)
-    public void remove(@Named("id") Long id) throws NotFoundException, UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public void remove(@Named("id") Long id) throws NotFoundException {
         checkExists(id);
         ofy().delete().type(IfBean.class).id(id).now();
         logger.info("Deleted IfBean with ID: " + id);
@@ -158,10 +138,7 @@ public class IfBeanEndpoint {
             name = "list",
             path = "ifBean",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public CollectionResponse<IfBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) throws UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public CollectionResponse<IfBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
         Query<IfBean> query = ofy().load().type(IfBean.class).limit(limit);
         if (cursor != null) {
@@ -179,10 +156,7 @@ public class IfBeanEndpoint {
             name = "random",
             path = "randomIfBean",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public IfBean random() throws UnauthorizedException {
-//        if (user == null) {
-//            throw new UnauthorizedException("User is not valid");
-//        }
+    public IfBean random(@Named("sessoinId") String sessionId) throws UnauthorizedException {
         Collection<IfBean> ifList = list(null, null).getItems();
         int rand = (int) (Math.random() * ifList.size());
         Iterator<IfBean> iterator = ifList.iterator();
@@ -192,7 +166,6 @@ public class IfBeanEndpoint {
         }
         return iterator.next();
     }
-
 
     private void checkExists(Long id) throws NotFoundException {
         try {
