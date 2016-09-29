@@ -11,6 +11,8 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
+import org.omg.PortableServer.THREAD_POLICY_ID;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -151,13 +153,12 @@ public class ThenBeanEndpoint {
         }
         return CollectionResponse.<ThenBean>builder().setItems(thenBeanList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
-
     @ApiMethod(
             name = "random",
             path = "randomThenBean",
             httpMethod = ApiMethod.HttpMethod.GET)
     public ThenBean random(@Named("sessionId") String sessionId) throws UnauthorizedException {
-        Collection<ThenBean> thenList = list(null, null).getItems();
+        Collection<ThenBean> thenList = listBySessionId(sessionId,null, null).getItems();
         int rand = (int) (Math.random() * thenList.size());
         Iterator<ThenBean> iterator = thenList.iterator();
         while (rand - 1 >= 0) {
@@ -165,6 +166,21 @@ public class ThenBeanEndpoint {
             rand--;
         }
         return iterator.next();
+    }
+
+    private CollectionResponse<ThenBean> listBySessionId(String sessionId,String cursor, Integer limit) {
+        limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
+        Query<ThenBean> query = ofy().load().type(ThenBean.class).filter("sessionId =",sessionId).limit(limit);
+        if (cursor != null) {
+            query = query.startAt(Cursor.fromWebSafeString(cursor));
+        }
+        QueryResultIterator<ThenBean> queryIterator = query.iterator();
+        List<ThenBean> thenBeanList = new ArrayList<ThenBean>(limit);
+        while (queryIterator.hasNext()) {
+            thenBeanList.add(queryIterator.next());
+        }
+        return CollectionResponse.<ThenBean>builder().setItems(thenBeanList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
+
     }
 
     private void checkExists(Long id) throws NotFoundException {

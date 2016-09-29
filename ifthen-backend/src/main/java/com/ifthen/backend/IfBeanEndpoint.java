@@ -152,12 +152,13 @@ public class IfBeanEndpoint {
         return CollectionResponse.<IfBean>builder().setItems(ifBeanList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
 
-    @ApiMethod(
+
+        @ApiMethod(
             name = "random",
             path = "randomIfBean",
             httpMethod = ApiMethod.HttpMethod.GET)
     public IfBean random(@Named("sessoinId") String sessionId) throws UnauthorizedException {
-        Collection<IfBean> ifList = list(null, null).getItems();
+        Collection<IfBean> ifList = listBySessionId(sessionId,null, null).getItems();
         int rand = (int) (Math.random() * ifList.size());
         Iterator<IfBean> iterator = ifList.iterator();
         while (rand - 1 >= 0) {
@@ -165,6 +166,21 @@ public class IfBeanEndpoint {
             rand--;
         }
         return iterator.next();
+    }
+
+    private CollectionResponse<IfBean> listBySessionId(String sessionId,String cursor, Integer limit) {
+        limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
+        Query<IfBean> query = ofy().load().type(IfBean.class).filter("sessionId =",sessionId).limit(limit);
+        if (cursor != null) {
+            query = query.startAt(Cursor.fromWebSafeString(cursor));
+        }
+        QueryResultIterator<IfBean> queryIterator = query.iterator();
+        List<IfBean> ifBeanList = new ArrayList<IfBean>(limit);
+        while (queryIterator.hasNext()) {
+            ifBeanList.add(queryIterator.next());
+        }
+        return CollectionResponse.<IfBean>builder().setItems(ifBeanList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
+
     }
 
     private void checkExists(Long id) throws NotFoundException {
