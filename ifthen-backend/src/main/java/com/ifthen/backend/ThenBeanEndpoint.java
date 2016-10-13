@@ -11,8 +11,6 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
-import org.omg.PortableServer.THREAD_POLICY_ID;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -142,7 +140,7 @@ public class ThenBeanEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<ThenBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<ThenBean> query = ofy().load().type(ThenBean.class).limit(limit);
+        Query<ThenBean> query = ofy().load().type(ThenBean.class).filter("isPubic =",true).limit(limit);
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
@@ -153,12 +151,13 @@ public class ThenBeanEndpoint {
         }
         return CollectionResponse.<ThenBean>builder().setItems(thenBeanList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
+
     @ApiMethod(
             name = "random",
             path = "randomThenBean",
             httpMethod = ApiMethod.HttpMethod.GET)
     public ThenBean random(@Named("sessionId") String sessionId) throws UnauthorizedException {
-        Collection<ThenBean> thenList = listBySessionId(sessionId,null, null).getItems();
+        Collection<ThenBean> thenList = listBySessionId(sessionId, null, null).getItems();
         int rand = (int) (Math.random() * thenList.size());
         Iterator<ThenBean> iterator = thenList.iterator();
         while (rand - 1 >= 0) {
@@ -168,9 +167,9 @@ public class ThenBeanEndpoint {
         return iterator.next();
     }
 
-    private CollectionResponse<ThenBean> listBySessionId(String sessionId,String cursor, Integer limit) {
+    private CollectionResponse<ThenBean> listBySessionId(String sessionId, String cursor, Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<ThenBean> query = ofy().load().type(ThenBean.class).filter("sessionId =",sessionId).limit(limit);
+        Query<ThenBean> query = ofy().load().type(ThenBean.class).filter("sessionId =", sessionId).limit(limit);
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }

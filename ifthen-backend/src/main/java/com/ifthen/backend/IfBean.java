@@ -18,8 +18,9 @@ public class IfBean {
     @Id Long id;
     private String text;
     @Index private String sessionId;
+    @Index private boolean isPublic;
+    private int count;
 }
-//
 //    @ApiMethod(
 //            name = "random",
 //            path = "randomIfBean",
@@ -48,4 +49,12 @@ public class IfBean {
 //        }
 //        return CollectionResponse.<IfBean>builder().setItems(ifBeanList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
 //
+//    }
+//
+//    private void checkExists(Long id) throws NotFoundException {
+//        try {
+//            ofy().load().type(IfBean.class).id(id).safe();
+//        } catch (com.googlecode.objectify.NotFoundException e) {
+//            throw new NotFoundException("Could not find IfBean with ID: " + id);
+//        }
 //    }
