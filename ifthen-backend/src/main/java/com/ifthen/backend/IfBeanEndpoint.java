@@ -110,6 +110,17 @@ public class IfBeanEndpoint {
         return ofy().load().entity(ifBean).now();
     }
 
+    @ApiMethod(
+            name = "updateCount",
+            path = "ifBean/{id}/{count}",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public IfBean updateCount(@Named("id") Long id, @Named("count") Integer count) throws NotFoundException {
+        IfBean ifBean = checkExists(id);
+        ifBean.setCount(count);
+        ofy().save().entity(ifBean).now();
+        return ofy().load().entity(ifBean).now();
+    }
+
     /**
      * Deletes the specified {@code IfBean}.
      *
@@ -140,7 +151,7 @@ public class IfBeanEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<IfBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<IfBean> query = ofy().load().type(IfBean.class).filter("isPublic =",true).limit(limit);
+        Query<IfBean> query = ofy().load().type(IfBean.class).filter("isPublic =", true).order("-count").limit(limit);
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
@@ -182,9 +193,9 @@ public class IfBeanEndpoint {
 
     }
 
-    private void checkExists(Long id) throws NotFoundException {
+    private IfBean checkExists(Long id) throws NotFoundException {
         try {
-            ofy().load().type(IfBean.class).id(id).safe();
+            return ofy().load().type(IfBean.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {
             throw new NotFoundException("Could not find IfBean with ID: " + id);
         }

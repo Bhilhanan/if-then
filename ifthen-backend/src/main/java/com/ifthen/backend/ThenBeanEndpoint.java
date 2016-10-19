@@ -110,6 +110,17 @@ public class ThenBeanEndpoint {
         return ofy().load().entity(thenBean).now();
     }
 
+    @ApiMethod(
+            name = "updateCount",
+            path = "thenBean/{id}/{count}",
+            httpMethod = ApiMethod.HttpMethod.PUT)
+    public ThenBean updateCount(@Named("id") Long id, @Named("count") Integer count) throws NotFoundException {
+        ThenBean thenBean = checkExists(id);
+        thenBean.setCount(count);
+        ofy().save().entity(thenBean).now();
+        return ofy().load().entity(thenBean).now();
+    }
+
     /**
      * Deletes the specified {@code ThenBean}.
      *
@@ -140,7 +151,7 @@ public class ThenBeanEndpoint {
             httpMethod = ApiMethod.HttpMethod.GET)
     public CollectionResponse<ThenBean> list(@Nullable @Named("cursor") String cursor, @Nullable @Named("limit") Integer limit) {
         limit = limit == null ? DEFAULT_LIST_LIMIT : limit;
-        Query<ThenBean> query = ofy().load().type(ThenBean.class).filter("isPubic =",true).limit(limit);
+        Query<ThenBean> query = ofy().load().type(ThenBean.class).filter("isPubic =", true).order("-count").limit(limit);
         if (cursor != null) {
             query = query.startAt(Cursor.fromWebSafeString(cursor));
         }
@@ -182,9 +193,9 @@ public class ThenBeanEndpoint {
 
     }
 
-    private void checkExists(Long id) throws NotFoundException {
+    private ThenBean checkExists(Long id) throws NotFoundException {
         try {
-            ofy().load().type(ThenBean.class).id(id).safe();
+            return ofy().load().type(ThenBean.class).id(id).safe();
         } catch (com.googlecode.objectify.NotFoundException e) {
             throw new NotFoundException("Could not find ThenBean with ID: " + id);
         }
